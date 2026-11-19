@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Soul.md 人设工坊</title>
+  <style>
+    :root {
+      --bg: #111318;
+      --panel: #191d26;
+      --panel-2: #222836;
+      --border: #2e3648;
+      --text: #e6ebf5;
+      --muted: #92a0b8;
+      --accent: #7c9cff;
+      --accent-2: #5b7cfa;
+      --ok: #3ddc97;
+      --danger: #ff6b7a;
+      --ink: #ffffff;
+    }
+    [data-theme="light"] {
+      --bg: #f4f6fb;
+      --panel: #ffffff;
+      --panel-2: #eef2fa;
+      --border: #d8e0ef;
+      --text: #182132;
+      --muted: #5a6a85;
+      --accent: #4f6ef7;
+      --accent-2: #3b5bdb;
+      --ok: #0ca678;
+      --danger: #e03131;
+      --ink: #ffffff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      background: var(--panel);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    header h1 { margin: 0; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+    .badge {
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(124,156,255,0.16);
+      color: var(--accent);
+      font-weight: 500;
+    }
+    .badge.ok { background: rgba(61,220,151,0.16); color: var(--ok); }
+    .tabs {
+      display: flex;
+      gap: 4px;
+      padding: 8px 12px 0;
+      border-bottom: 1px solid var(--border);
+      background: var(--panel);
+    }
+    .tab {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      padding: 7px 12px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      font-size: 12.5px;
+    }
+    .tab.active { color: var(--text); border-bottom-color: var(--accent); font-weight: 600; }
+    main { padding: 12px; max-width: 960px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+    }
+    .row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .between { justify-content: space-between; }
+    .card-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 9px 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--panel-2);
+      cursor: pointer;
+      transition: border-color .15s;
+    }
+    .card-item.selected { border-color: var(--accent); }
+    .card-list { display: flex; flex-direction: column; gap: 8px; }
+    .meta { color: var(--muted); font-size: 11.5px; }
+    button {
+      background: var(--panel-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 5px 10px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    button:hover { border-color: var(--accent); }
+    button.primary { background: var(--accent-2); border-color: var(--accent-2); color: var(--ink); }
+    button.danger { color: var(--danger); }
+    button.danger:hover { border-color: var(--danger); }
+    input, select, textarea {
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 7px 9px;
+      font-family: inherit;
+      font-size: 12.5px;
+      width: 100%;
+    }
+    textarea {
+      min-height: 240px;
+      font-family: "Cascadia Code", Consolas, monospace;
+      resize: vertical;
+      line-height: 1.55;
+    }
+    .toast {
+      position: fixed;
+      bottom: 14px;
+      right: 14px;
+      background: var(--panel-2);
+      border: 1px solid var(--accent);
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s;
+      z-index: 50;
+    }
+    .toast.show { opacity: 1; }
+    .hidden { display: none !important; }
+    label.switch { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; color: var(--muted); cursor: pointer; }
+    label.switch input { width: auto; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>✨ Soul.md 人设工坊 <span class="badge ok" id="active-badge">加载中...</span></h1>
+    <div class="row">
+      <button id="theme-btn" onclick="toggleTheme()">🌙 暗色</button>
+      <button onclick="copyWebUrl()">全屏地址</button>
+      <button onclick="refreshAll()">刷新</button>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="cards" onclick="switchTab('cards')">人设卡</button>
+    <button class="tab" data-tab="workspaces" onclick="switchTab('workspaces')">工作区绑定</button>
+    <button class="tab" data-tab="memory" onclick="switchTab('memory')">分层记忆</button>
+  </div>
+
+  <main>
+    <!-- TAB 1: 人设卡 -->
+    <section id="tab-cards" class="card-list">
+      <div class="card">
+        <div class="row between" style="margin-bottom:8px;">
+          <strong>全部人设卡</strong>
+          <div class="row">
+            <button onclick="disableDefault()">停用默认人设</button>
+            <button class="primary" onclick="promptNewCard()">+ 新建人设卡</button>
+          </div>
+        </div>
+        <div id="cards-list" class="card-list"></div>
+      </div>
+
+      <div class="card">
+        <div class="row between" style="margin-bottom:8px;">
+          <strong id="editor-title">编辑人设卡</strong>
+          <div class="row">
+            <button class="primary" onclick="saveCurrentCard()">保存人设卡</button>
+          </div>
+        </div>
+        <textarea id="card-editor" placeholder="选择一张人设卡，或新建一张 Markdown 人设卡..."></textarea>
+        <div class="meta" style="margin-top:6px;">提示：切换或保存默认人设卡后，会自动同步到全局规则并在下一轮对话生效。</div>
+      </div>
+    </section>
+
+    <!-- TAB 2: 工作区绑定 -->
+    <section id="tab-workspaces" class="card-list hidden">
+      <div class="card">
+        <strong>为工作区指定专属人设</strong>
+        <div class="meta" style="margin:4px 0 10px;">优先级：工作区绑定（写入 .agents/rules/soul-md.md） → 全局默认人设卡</div>
+        <div class="row" style="margin-bottom:8px;">
+          <input id="ws-path" placeholder="工作区绝对路径，例如 /path/to/project 或 D:\Projects\my-app" />
+        </div>
+        <div class="row">
+          <select id="ws-card" style="flex:1;"></select>
+          <button class="primary" onclick="bindWorkspace()">保存绑定</button>
+        </div>
+      </div>
+      <div class="card">
+        <strong style="display:block;margin-bottom:8px;">已绑定工作区</strong>
+        <div id="ws-list" class="card-list"></div>
+      </div>
+    </section>
+
+    <!-- TAB 3: 分层记忆 -->
+    <section id="tab-memory" class="card-list hidden">
+      <div class="card">
+        <div class="row between" style="margin-bottom:8px;">
+          <strong>记忆设置与检索</strong>
+          <div class="row">
+            <select id="mem-card" style="width:auto;" onchange="loadMemory()"></select>
+            <select id="mem-scope" style="width:auto;" onchange="updateScope()">
+              <option value="persona">按人设隔离 (persona)</option>
+              <option value="global">全局共享 (global)</option>
+            </select>
+          </div>
+        </div>
+        <div class="row">
+          <input id="mem-search-q" placeholder="搜索 core.md 与 topics 关键词..." style="flex:1;" />
+          <button onclick="searchMemory()">检索</button>
+        </div>
+        <div id="mem-search-result" class="meta" style="margin-top:8px;"></div>
+      </div>
+
+      <div class="card">
+        <div class="row between" style="margin-bottom:8px;">
+          <div class="row">
+            <strong>记忆文件</strong>
+            <select id="mem-topic" style="width:auto;" onchange="loadTopicContent()"></select>
+          </div>
+          <div class="row">
+            <button onclick="promptNewTopic()">+ 新建主题</button>
+            <button class="primary" onclick="saveTopicContent()">保存记忆</button>
+          </div>
+        </div>
+        <textarea id="mem-editor" placeholder="core.md 会自动随人设卡注入，topics/*.md 按需读取..."></textarea>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    const params = new URLSearchParams(location.search);
+    const TOKEN = params.get("token") || "";
+    let state = { defaultCard: null, cards: [], workspaceCards: {}, memory: {}, webUrl: "" };
+    let selectedCard = null;
+    let currentTopic = "core";
+
+    function api(url, opts = {}) {
+      const headers = Object.assign({ "Content-Type": "application/json" }, opts.headers || {});
+      if (TOKEN) headers["X-Codeium-Sidecar-Token"] = TOKEN;
+      return fetch(url, Object.assign({}, opts, { headers })).then(async (r) => {
+        const data = await r.json().catch(() => ({}));
+        if (!r.ok) throw new Error(data.error || ("HTTP " + r.status));
+        return data;
+      });
+    }
+
+    function toast(msg) {
+      const el = document.getElementById("toast");
+      el.textContent = msg;
+      el.classList.add("show");
+      clearTimeout(window._t);
+      window._t = setTimeout(() => el.classList.remove("show"), 2200);
+    }
+
+    function applyTheme(t) {
+      const mode = t === "light" ? "light" : "dark";
+      if (mode === "light") document.documentElement.setAttribute("data-theme", "light");
+      else document.documentElement.removeAttribute("data-theme");
+      document.getElementById("theme-btn").textContent = mode === "light" ? "☀ 亮色" : "🌙 暗色";
+      try { localStorage.setItem("soul_md_theme", mode); } catch {}
+    }
+
+    function toggleTheme() {
+      const isLight = document.documentElement.getAttribute("data-theme") === "light";
+      applyTheme(isLight ? "dark" : "light");
+    }
+
+    function copyWebUrl() {
+      const url = state.webUrl || location.href;
+      navigator.clipboard?.writeText(url).then(() => toast("已复制全屏地址：" + url)).catch(() => toast(url));
+    }
+
+    function switchTab(name) {
+      document.querySelectorAll(".tab").forEach((b) => b.classList.toggle("active", b.dataset.tab === name));
+      ["cards", "workspaces", "memory"].forEach((t) => {
+        document.getElementById("tab-" + t).classList.toggle("hidden", t !== name);
+      });
+      if (name === "memory") loadMemory();
+    }
+
+    async function refreshAll() {
+      state = await api("/api/state");
+      document.getElementById("active-badge").textContent = state.defaultCard ? ("默认：" + state.defaultCard) : "默认：已停用";
+      if (!selectedCard || !state.cards.some((c) => c.name === selectedCard)) {
+        selectedCard = state.defaultCard || (state.cards[0] && state.cards[0].name) || null;
+      }
+      renderCards();
+      renderWorkspaces();
+      renderMemSelectors();
+      if (selectedCard) await selectCard(selectedCard);
+    }
+
+    function renderCards() {
+      const box = document.getElementById("cards-list");
+      box.innerHTML = "";
+      if (!state.cards.length) {
+        box.innerHTML = '<div class="meta">还没有人设卡，点右上角新建一张吧。</div>';
+        return;
+      }
+      for (const c of state.cards) {
+        const div = document.createElement("div");
+        div.className = "card-item" + (c.name === selectedCard ? " selected" : "");
+        div.onclick = (e) => { if (e.target.tagName !== "BUTTON" && e.target.tagName !== "INPUT") selectCard(c.name); };
+        div.innerHTML = `
+          <div>
+            <div class="row">
+              <strong>${escapeHtml(c.name)}</strong>
+              ${c.isDefault ? '<span class="badge ok">当前默认</span>' : ''}
+            </div>
+            <div class="meta">${escapeHtml(c.title)} · ${c.chars} 字</div>
+          </div>
+          <div class="row">
+            <label class="switch" onclick="event.stopPropagation()">
+              <input type="checkbox" ${c.memoryEnabled ? "checked" : ""} onchange="toggleMem('${escapeJs(c.name)}', this.checked)" />
+              记忆
+            </label>
+            ${c.isDefault ? "" : `<button class="primary" onclick="setDefault('${escapeJs(c.name)}')">设为默认</button>`}
+            <button class="danger" onclick="deleteCard('${escapeJs(c.name)}')">删除</button>
+          </div>
+        `;
+        box.appendChild(div);
+      }
+    }
+
+    async function selectCard(name) {
+      selectedCard = name;
+      renderCards();
+      const data = await api("/api/card?name=" + encodeURIComponent(name));
+      document.getElementById("editor-title").textContent = "编辑人设卡：" + name;
+      document.getElementById("card-editor").value = data.content || "";
+    }
+
+    async function saveCurrentCard() {
+      if (!selectedCard) return toast("请先选择或新建人设卡");
+      const content = document.getElementById("card-editor").value;
+      await api("/api/card", { method: "POST", body: JSON.stringify({ name: selectedCard, content }) });
+      toast("已保存并同步规则：" + selectedCard);
+      await refreshAll();
+    }
+
+    async function promptNewCard() {
+      const name = prompt("输入新人设卡名称（例如：代码审查官 / 翻译助手）：");
+      if (!name || !name.trim()) return;
+      const tpl = `# 人设卡：${name.trim()}\n\n## 风格\n- 在这里写语气与规则...\n\n## 工作准则\n- 技术准确第一，工具正常使用。\n`;
+      await api("/api/card", { method: "POST", body: JSON.stringify({ name: name.trim(), content: tpl }) });
+      selectedCard = name.trim();
+      toast("已创建人设卡：" + selectedCard);
+      await refreshAll();
+    }
+
+    async function setDefault(name) {
+      await api("/api/default", { method: "POST", body: JSON.stringify({ name }) });
+      toast("已切换默认人设卡为：" + name);
+      await refreshAll();
+    }
+
+    async function disableDefault() {
+      await api("/api/default", { method: "POST", body: JSON.stringify({ name: "__none__" }) });
+      toast("已停用全局默认人设");
+      await refreshAll();
+    }
+
+    async function deleteCard(name) {
+      if (!confirm(`确定删除人设卡「${name}」吗？（已存记忆文件会保留）`)) return;
+      await api("/api/card/delete", { method: "POST", body: JSON.stringify({ name }) });
+      toast("已删除：" + name);
+      await refreshAll();
+    }
+
+    async function toggleMem(card, enabled) {
+      await api("/api/memory/toggle", { method: "POST", body: JSON.stringify({ card, enabled }) });
+      toast(`${card} 的记忆已${enabled ? "开启" : "关闭"}`);
+      await refreshAll();
+    }
+
+    function renderWorkspaces() {
+      const sel = document.getElementById("ws-card");
+      sel.innerHTML = state.cards.map((c) => `<option value="${escapeHtml(c.name)}">${escapeHtml(c.name)}</option>`).join("")
+        + '<option value="__none__">（此工作区禁用人设）</option>';
+      const list = document.getElementById("ws-list");
+      list.innerHTML = "";
+      const entries = Object.entries(state.workspaceCards || {});
+      if (!entries.length) {
+        list.innerHTML = '<div class="meta">暂无工作区专属绑定，当前全部继承默认人设卡。</div>';
+        return;
+      }
+      for (const [ws, card] of entries) {
+        const row = document.createElement("div");
+        row.className = "card-item";
+        row.innerHTML = `
+          <div>
+            <strong>${escapeHtml(ws)}</strong>
+            <div class="meta">绑定人设：${card === "__none__" ? "禁用人设" : escapeHtml(card)}</div>
+          </div>
+          <button class="danger" onclick="unbindWorkspace('${escapeJs(ws)}')">解绑</button>
+        `;
+        list.appendChild(row);
+      }
+    }
+
+    async function bindWorkspace() {
+      const workspace = document.getElementById("ws-path").value.trim();
+      const card = document.getElementById("ws-card").value;
+      if (!workspace) return toast("请填写工作区路径");
+      await api("/api/workspace", { method: "POST", body: JSON.stringify({ workspace, card }) });
+      toast("已保存工作区绑定");
+      document.getElementById("ws-path").value = "";
+      await refreshAll();
+    }
+
+    async function unbindWorkspace(workspace) {
+      await api("/api/workspace", { method: "POST", body: JSON.stringify({ workspace, card: "__inherit__" }) });
+      toast("已取消工作区绑定");
+      await refreshAll();
+    }
+
+    function renderMemSelectors() {
+      const sel = document.getElementById("mem-card");
+      const prev = sel.value || selectedCard || state.defaultCard || "";
+      sel.innerHTML = state.cards.map((c) => `<option value="${escapeHtml(c.name)}">${escapeHtml(c.name)}</option>`).join("");
+      if (prev) sel.value = prev;
+      document.getElementById("mem-scope").value = (state.memory && state.memory.scope) || "persona";
+    }
+
+    async function updateScope() {
+      const scope = document.getElementById("mem-scope").value;
+      await api("/api/memory/settings", { method: "POST", body: JSON.stringify({ scope }) });
+      toast("记忆作用域已切换为：" + scope);
+      await loadMemory();
+    }
+
+    async function loadMemory() {
+      const card = document.getElementById("mem-card").value;
+      const scope = document.getElementById("mem-scope").value;
+      try {
+        const data = await api(`/api/memory/list?card=${encodeURIComponent(card)}&scope=${encodeURIComponent(scope)}`);
+        const sel = document.getElementById("mem-topic");
+        const opts = ['<option value="core">core.md（常驻核心记忆）</option>']
+          .concat((data.topics || []).map((t) => `<option value="${escapeHtml(t.key)}">topics/${escapeHtml(t.key)}.md</option>`));
+        sel.innerHTML = opts.join("");
+        sel.value = currentTopic;
+        if (!sel.value) sel.value = "core";
+        await loadTopicContent();
+      } catch (e) {
+        document.getElementById("mem-editor").value = "";
+        toast(e.message);
+      }
+    }
+
+    async function loadTopicContent() {
+      const card = document.getElementById("mem-card").value;
+      const scope = document.getElementById("mem-scope").value;
+      currentTopic = document.getElementById("mem-topic").value || "core";
+      const data = await api(`/api/memory/read?card=${encodeURIComponent(card)}&scope=${encodeURIComponent(scope)}&topic=${encodeURIComponent(currentTopic)}`);
+      document.getElementById("mem-editor").value = data.content || "";
+    }
+
+    async function saveTopicContent() {
+      const card = document.getElementById("mem-card").value;
+      const scope = document.getElementById("mem-scope").value;
+      const content = document.getElementById("mem-editor").value;
+      await api("/api/memory/rewrite", { method: "POST", body: JSON.stringify({ card, scope, topic: currentTopic, content }) });
+      toast("已保存记忆：" + currentTopic);
+      await loadMemory();
+    }
+
+    async function promptNewTopic() {
+      const topic = prompt("输入新主题名（例如：偏好 / 项目架构 / 常用命令）：");
+      if (!topic || !topic.trim()) return;
+      const card = document.getElementById("mem-card").value;
+      const scope = document.getElementById("mem-scope").value;
+      await api("/api/memory/rewrite", { method: "POST", body: JSON.stringify({ card, scope, topic: topic.trim(), content: `# ${topic.trim()}\n\n` }) });
+      currentTopic = topic.trim();
+      toast("已新建主题：" + currentTopic);
+      await loadMemory();
+    }
+
+    async function searchMemory() {
+      const q = document.getElementById("mem-search-q").value.trim();
+      if (!q) return;
+      const card = document.getElementById("mem-card").value;
+      const scope = document.getElementById("mem-scope").value;
+      const res = await api(`/api/memory/search?q=${encodeURIComponent(q)}&card=${encodeURIComponent(card)}&scope=${encodeURIComponent(scope)}`);
+      const out = document.getElementById("mem-search-result");
+      if (!res.hits.length) {
+        out.textContent = "未找到匹配条目。";
+        return;
+      }
+      out.innerHTML = res.hits.map((h) => `<div>• <strong>${escapeHtml(h.topic)}</strong>（${h.matchCount} 处）：${escapeHtml(h.matches[0].text)}</div>`).join("");
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
+    }
+    function escapeJs(s) {
+      return String(s).replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+    }
+
+    try { applyTheme(localStorage.getItem("soul_md_theme") || "dark"); } catch {}
+    refreshAll().catch((e) => toast("加载失败：" + e.message));
+  </script>
+</body>
+</html>

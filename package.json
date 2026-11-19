@@ -1,0 +1,28 @@
+{
+  "name": "antigravity-soul-md",
+  "version": "2.0.0",
+  "description": "Multi-persona card switcher and layered file memory plugin for Antigravity with Soul.md Studio sidecar UI.",
+  "type": "module",
+  "license": "MIT",
+  "author": "A16Nights",
+  "homepage": "https://github.com/A16Nights/antigravity-soul-md#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/A16Nights/antigravity-soul-md.git"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "test": "node --test tests/soul-md.test.mjs",
+    "start": "node mcp-server.mjs"
+  },
+  "keywords": [
+    "antigravity",
+    "antigravity-plugin",
+    "persona",
+    "soul-md",
+    "mcp",
+    "memory"
+  ]
+}
