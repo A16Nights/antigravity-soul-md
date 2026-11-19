@@ -1,5 +1,7 @@
 # Soul.md 人设工坊（Antigravity Soul.md Studio）
 
+**简体中文** | [English](README.en.md)
+
 > **Multi-persona card switcher, workspace persona binding, and layered Markdown file memory (`core.md` + `topics/*.md`) for Google Antigravity.**
 
 为 **Google Antigravity** 提供可切换的多人设卡管理、工作区专属人设覆盖、按人设隔离的分层文件记忆，以及内置的 **Soul.md 人设工坊** 可视化侧栏面板。零外部依赖，纯 Node.js 原生运行。
