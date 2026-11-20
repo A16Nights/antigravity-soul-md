@@ -1,7 +1,7 @@
 {
   "$schema": "https://antigravity.google/schemas/v1/plugin.json",
   "name": "soul-md",
-  "displayName": "Soul.md 人设工坊",
+  "displayName": "苍蓝魂匣",
   "version": "2.0.0",
   "description": "Multi-persona card switcher and layered file memory (core.md + topics/*.md) plugin for Antigravity with workspace binding and visual Soul.md Studio panel.",
   "logo": "assets/logo.svg",
