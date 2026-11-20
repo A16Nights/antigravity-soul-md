@@ -1,23 +1,24 @@
-# Soul.md 人设工坊（Antigravity Soul.md Studio）
+# 苍蓝魂匣 · Soul.md（Antigravity Soul.md Studio）
 
 **简体中文** | [English](README.en.md)
 
-> **Multi-persona card switcher, workspace persona binding, and layered Markdown file memory (`core.md` + `topics/*.md`) for Google Antigravity.**
+> **Multi-persona card switcher, workspace persona binding, PreInvocation anti-drift anchor hook, and layered Markdown file memory (`core.md` + `topics/*.md`) for Google Antigravity.**
 
-为 **Google Antigravity** 提供可切换的多人设卡管理、工作区专属人设覆盖、按人设隔离的分层文件记忆，以及内置的 **Soul.md 人设工坊** 可视化侧栏面板。零外部依赖，纯 Node.js 原生运行。
+为 **Google Antigravity** 提供可切换的多人设卡管理、工作区专属人设覆盖、`PreInvocation` 每轮底层身份锚防掉线强化、按人设隔离的分层文件记忆，以及内置的 **苍蓝魂匣** 可视化侧栏面板。零外部依赖，纯 Node.js 原生运行。
 
 ---
 
 ## ✨ 核心特性
 
 - **多人设卡管理与热切换**：随时新建、编辑、删除人设卡，一键切换全局默认人设，自动同步到生效规则并在下一轮对话起生效。
+- **每轮 `PreInvocation` 底层身份锚防掉线**：每轮模型调用前自动注入当前人设卡的精简核心锚点（支持 `<!-- soul-md-anchor-start --> ... <!-- soul-md-anchor-end -->` 自定义区块），专治长会话与外接 API 模型掉人设问题。
 - **工作区专属人设**：支持为特定项目目录绑定独立人设卡（写入 `<workspace>/.agents/rules/soul-md.md`），覆盖全局默认人设；解绑时自动清理管理文件。
 - **分层文件记忆（`core.md` + `topics/*.md`）**：
   - `core.md` 常驻随当前人设注入上下文（支持字符预算保护）；
   - `topics/*.md` 按主题拆分存放，按需读取全文与关键词搜索；
   - 支持 `persona`（按人设隔离）与 `global`（全局共享）两种作用域，并且可为单张人设卡独立关闭记忆开关。
 - **10 个 MCP 工具**：让 Agent 在对话中主动读取/演化人设卡与记忆。
-- **可视化人设工坊（Sidecar UI）**：右侧辅助栏或浏览器全屏直观编辑人设卡、配置工作区绑定和检索分层记忆，支持暗色/亮色主题切换。
+- **可视化苍蓝魂匣（Sidecar UI）**：右侧辅助栏或浏览器全屏直观编辑人设卡、配置工作区绑定和检索分层记忆，支持暗色/亮色主题切换。
 
 ---
 
