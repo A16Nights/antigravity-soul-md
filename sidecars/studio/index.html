@@ -193,6 +193,14 @@
   </div>
 
   <main>
+    <div class="card" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px;padding:10px 14px;">
+      <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:12.5px;user-select:none;">
+        <input type="checkbox" id="chk-anchor-reinforce" onchange="toggleAnchorReinforce(this.checked)" style="width:auto;margin:0;accent-color:var(--accent);" />
+        <span>开启每轮 PreInvocation 身份锚强化（仅对外接模型生效，Antigravity内部模型自动跳过）</span>
+      </label>
+      <span id="anchor-reinforce-status" class="meta">当前：加载中...</span>
+    </div>
+
     <!-- TAB 1: 人设卡 -->
     <section id="tab-cards" class="card-list">
       <div class="card">
@@ -340,6 +348,11 @@
       }
       if (manual) toast("已刷新最新状态");
       document.getElementById("active-badge").textContent = state.defaultCard ? ("默认：" + state.defaultCard) : "默认：已停用";
+      const anchorOn = state.anchor?.enabled !== false;
+      const chkAnchor = document.getElementById("chk-anchor-reinforce");
+      const statusAnchor = document.getElementById("anchor-reinforce-status");
+      if (chkAnchor) chkAnchor.checked = anchorOn;
+      if (statusAnchor) statusAnchor.textContent = anchorOn ? "当前：已开启（外接模型）" : "当前：已关闭";
       if (!selectedCard || !state.cards.some((c) => c.name === selectedCard)) {
         selectedCard = state.defaultCard || (state.cards[0] && state.cards[0].name) || null;
       }
@@ -383,6 +396,7 @@
 
     async function selectCard(name) {
       selectedCard = name;
+      try { window.AzureTone?.applySeed(name); } catch {}
       renderCards();
       const data = await api("/api/card?name=" + encodeURIComponent(name));
       document.getElementById("editor-title").textContent = "编辑人设卡：" + name;
@@ -397,8 +411,137 @@
       await refreshAll();
     }
 
+    function ensureAzureDialogStyle() {
+      if (document.getElementById("az-confirm-style")) return;
+      const st = document.createElement("style");
+      st.id = "az-confirm-style";
+      st.textContent = `
+        .az-confirm-mask{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.56);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:16px;}
+        .az-confirm-box{width:100%;max-width:390px;background:var(--card,var(--panel,#181e2e));color:var(--text,#e6edf7);border:1px solid var(--border,rgba(148,163,184,0.24));border-radius:12px;padding:16px;box-shadow:0 18px 42px rgba(0,0,0,0.42);}
+        .az-confirm-box h3{margin:0 0 10px;font-size:15px;font-weight:600;color:var(--text,#e6edf7);}
+        .az-confirm-msg{margin:0 0 8px;font-size:13px;line-height:1.6;color:var(--text,#e6edf7);}
+        .az-confirm-note{margin:0 0 4px;font-size:12px;line-height:1.5;color:var(--muted,#94a3b8);}
+        .az-confirm-input{width:100%;box-sizing:border-box;padding:8px 10px;border-radius:8px;border:1px solid var(--border,rgba(148,163,184,0.32));background:var(--bg,#0f1422);color:var(--text,#e6edf7);font-size:13px;outline:none;}
+        .az-confirm-input:focus{border-color:var(--accent,#3b82f6);}
+        .az-confirm-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px;}
+        .az-confirm-btn{padding:6px 13px;border-radius:8px;font-size:12px;cursor:pointer;border:1px solid var(--border,rgba(148,163,184,0.28));background:var(--panel-2,rgba(148,163,184,0.1));color:var(--text,#e6edf7);transition:all .15s ease;}
+        .az-confirm-btn:hover{border-color:var(--accent,#3b82f6);transform:translateY(-1px);}
+        .az-confirm-btn.danger{background:rgba(247,118,142,0.16);border-color:var(--danger,#f7768e);color:var(--danger,#f7768e);}
+        .az-confirm-btn.danger:hover{background:var(--danger,#f7768e);color:#fff;}
+        .az-confirm-btn.primary{background:var(--accent,#3b82f6);border-color:var(--accent,#3b82f6);color:#fff;}
+      `;
+      document.head.appendChild(st);
+    }
+
+    function azureConfirm({ title = "确认操作", message = "", note = "", okText = "确认", cancelText = "取消", danger = true } = {}) {
+      return new Promise((resolve) => {
+        ensureAzureDialogStyle();
+        const mask = document.createElement("div");
+        mask.className = "az-confirm-mask";
+        const box = document.createElement("div");
+        box.className = "az-confirm-box";
+        box.setAttribute("role", "dialog");
+        box.setAttribute("aria-modal", "true");
+        const h3 = document.createElement("h3");
+        h3.textContent = title;
+        const pMsg = document.createElement("p");
+        pMsg.className = "az-confirm-msg";
+        pMsg.textContent = message;
+        box.appendChild(h3);
+        box.appendChild(pMsg);
+        if (note) {
+          const pNote = document.createElement("p");
+          pNote.className = "az-confirm-note";
+          pNote.textContent = note;
+          box.appendChild(pNote);
+        }
+        const actions = document.createElement("div");
+        actions.className = "az-confirm-actions";
+        const btnCancel = document.createElement("button");
+        btnCancel.className = "az-confirm-btn";
+        btnCancel.textContent = cancelText;
+        const btnOk = document.createElement("button");
+        btnOk.className = "az-confirm-btn " + (danger ? "danger" : "primary");
+        btnOk.textContent = okText;
+        actions.appendChild(btnCancel);
+        actions.appendChild(btnOk);
+        box.appendChild(actions);
+        mask.appendChild(box);
+        const close = (val) => {
+          window.removeEventListener("keydown", onKey);
+          mask.remove();
+          resolve(val);
+        };
+        const onKey = (e) => { if (e.key === "Escape") close(false); };
+        btnCancel.onclick = () => close(false);
+        btnOk.onclick = () => close(true);
+        mask.onclick = (e) => { if (e.target === mask) close(false); };
+        window.addEventListener("keydown", onKey);
+        document.body.appendChild(mask);
+      });
+    }
+
+    function azurePrompt({ title = "请输入", message = "", placeholder = "", defaultValue = "", okText = "确定", cancelText = "取消" } = {}) {
+      return new Promise((resolve) => {
+        ensureAzureDialogStyle();
+        const mask = document.createElement("div");
+        mask.className = "az-confirm-mask";
+        const box = document.createElement("div");
+        box.className = "az-confirm-box";
+        box.setAttribute("role", "dialog");
+        box.setAttribute("aria-modal", "true");
+        const h3 = document.createElement("h3");
+        h3.textContent = title;
+        box.appendChild(h3);
+        if (message) {
+          const pMsg = document.createElement("p");
+          pMsg.className = "az-confirm-msg";
+          pMsg.textContent = message;
+          box.appendChild(pMsg);
+        }
+        const input = document.createElement("input");
+        input.type = "text";
+        input.className = "az-confirm-input";
+        input.placeholder = placeholder;
+        input.value = defaultValue;
+        box.appendChild(input);
+        const actions = document.createElement("div");
+        actions.className = "az-confirm-actions";
+        const btnCancel = document.createElement("button");
+        btnCancel.className = "az-confirm-btn";
+        btnCancel.textContent = cancelText;
+        const btnOk = document.createElement("button");
+        btnOk.className = "az-confirm-btn primary";
+        btnOk.textContent = okText;
+        actions.appendChild(btnCancel);
+        actions.appendChild(btnOk);
+        box.appendChild(actions);
+        mask.appendChild(box);
+        const close = (val) => {
+          window.removeEventListener("keydown", onKey);
+          mask.remove();
+          resolve(val);
+        };
+        const onKey = (e) => {
+          if (e.key === "Escape") close(null);
+          if (e.key === "Enter") close(input.value);
+        };
+        btnCancel.onclick = () => close(null);
+        btnOk.onclick = () => close(input.value);
+        mask.onclick = (e) => { if (e.target === mask) close(null); };
+        window.addEventListener("keydown", onKey);
+        document.body.appendChild(mask);
+        setTimeout(() => input.focus(), 10);
+      });
+    }
+
     async function promptNewCard() {
-      const name = prompt("输入新人设卡名称（例如：代码审查官 / 翻译助手）：");
+      const name = await azurePrompt({
+        title: "新建人设卡",
+        message: "请输入新人设卡名称：",
+        placeholder: "例如：代码审查官 / 翻译助手",
+        okText: "创建"
+      });
       if (!name || !name.trim()) return;
       const tpl = `# 人设卡：${name.trim()}\n\n## 风格\n- 在这里写语气与规则...\n\n## 工作准则\n- 技术准确第一，工具正常使用。\n`;
       await api("/api/card", { method: "POST", body: JSON.stringify({ name: name.trim(), content: tpl }) });
@@ -413,6 +556,18 @@
       await refreshAll();
     }
 
+    async function toggleAnchorReinforce(enabled) {
+      try {
+        await api("/api/anchor/settings", { method: "POST", body: JSON.stringify({ enabled: Boolean(enabled) }) });
+        const statusAnchor = document.getElementById("anchor-reinforce-status");
+        if (statusAnchor) statusAnchor.textContent = enabled ? "当前：已开启（外接模型）" : "当前：已关闭";
+        toast(enabled ? "已开启每轮身份锚强化（仅外接模型生效）" : "已关闭每轮身份锚强化");
+      } catch (e) {
+        toast("保存失败：" + e.message, true);
+        await refreshAll();
+      }
+    }
+
     async function disableDefault() {
       await api("/api/default", { method: "POST", body: JSON.stringify({ name: "__none__" }) });
       toast("已停用全局默认人设");
@@ -420,7 +575,14 @@
     }
 
     async function deleteCard(name) {
-      if (!confirm(`确定删除人设卡「${name}」吗？（已存记忆文件会保留）`)) return;
+      const ok = await azureConfirm({
+        title: "确认删除人设卡",
+        message: `确定要删除人设卡「${name}」吗？`,
+        note: "已保存的记忆文件将会保留，不会被删除。",
+        okText: "确认删除",
+        danger: true
+      });
+      if (!ok) return;
       await api("/api/card/delete", { method: "POST", body: JSON.stringify({ name }) });
       toast("已删除：" + name);
       await refreshAll();
@@ -524,7 +686,12 @@
     }
 
     async function promptNewTopic() {
-      const topic = prompt("输入新主题名（例如：偏好 / 项目架构 / 常用命令）：");
+      const topic = await azurePrompt({
+        title: "新建记忆主题",
+        message: "请输入新主题名：",
+        placeholder: "例如：偏好 / 项目架构 / 常用命令",
+        okText: "创建"
+      });
       if (!topic || !topic.trim()) return;
       const card = document.getElementById("mem-card").value;
       const scope = document.getElementById("mem-scope").value;

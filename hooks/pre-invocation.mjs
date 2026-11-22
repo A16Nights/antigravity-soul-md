@@ -1,11 +1,9 @@
 #!/usr/bin/env node
 import fs from "node:fs";
 import path from "node:path";
-import os from "node:os";
-import { SoulStore } from "../lib/store.mjs";
-
-const HOME = process.env.USERPROFILE || os.homedir();
-const CARDS_DIR = path.join(HOME, ".gemini", "soul-md", "cards");
+import { SoulStore, CARDS_DIR } from "../lib/store.mjs";
+import { TurnDedupStore, buildFingerprint } from "../lib/turn-dedup.mjs";
+import { isExternalModel } from "../lib/external-model-guard.mjs";
 
 function readStdin() {
   return new Promise((resolve) => {
@@ -20,18 +18,13 @@ function readStdin() {
 }
 
 function buildAnchor(cardName, cardContent) {
-  const raw = String(cardContent || "");
-  const customMatch = raw.match(/<!--\s*soul-md-anchor-start\s*-->([\s\S]*?)<!--\s*soul-md-anchor-end\s*-->/i);
-  if (customMatch && customMatch[1].trim()) {
-    return `[Soul.md 底层身份锚 · 当前人设：${cardName}]\n${customMatch[1].trim()}`;
-  }
 
-  const lines = raw
+  const lines = String(cardContent || "")
     .split(/\r?\n/)
     .map((l) => l.trim())
     .filter((l) => l && !l.startsWith("<!--"));
-  const summary = lines.slice(0, 8).join("\n").slice(0, 360);
-  return `[Soul.md 底层身份锚 · 当前人设：${cardName}]\n${summary}\n保持上述人设语气与称呼，技术准确永远第一。`;
+  const summary = lines.slice(0, 8).join("\n").slice(0, 320);
+  return `[Soul.md 底层身份锚 · 当前人设：${cardName}]\n${summary}`;
 }
 
 async function main() {
@@ -44,10 +37,19 @@ async function main() {
       // ignore invalid json
     }
   }
+  if (!input || typeof input !== "object") {
+    input = {};
+  }
 
   const store = new SoulStore();
   const cfg = store.getConfig();
   if (cfg.anchor && cfg.anchor.enabled === false) {
+    process.stdout.write("{}\n");
+    return;
+  }
+
+  // 仅对外接自定义模型生效；Antigravity 内部模型自动跳过
+  if (!isExternalModel(input)) {
     process.stdout.write("{}\n");
     return;
   }
@@ -72,6 +74,21 @@ async function main() {
   const cardPath = path.join(CARDS_DIR, `${activeCard}.md`);
   const cardContent = fs.existsSync(cardPath) ? fs.readFileSync(cardPath, "utf8") : "";
   const anchorText = buildAnchor(activeCard, cardContent);
+  const fingerprint = buildFingerprint(activeCard, anchorText);
+
+  // 回合级去重：同一用户轮次（initialNumSteps）只注入一次；
+  // 切换人设 / 修改人设卡内容导致指纹变化时立即重新注入。
+  // 状态读写异常一律 fail-open（照常注入），绝不抛错。
+  try {
+    const dedup = new TurnDedupStore();
+    const decision = dedup.evaluate(input, fingerprint);
+    if (decision.skip) {
+      process.stdout.write("{}\n");
+      return;
+    }
+  } catch {
+    // ignore: 去重失败时继续正常注入
+  }
 
   const output = {
     injectSteps: [

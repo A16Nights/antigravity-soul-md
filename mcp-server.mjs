@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { getSidebarToolDefinition, getSidebarResourceDefinition, getSidebarResourceUri, handleSidebarToolCall, buildSidebarResourceReadResult } from "./lib/sidebar-nav.mjs";
 import readline from "node:readline";
 import { SoulStore } from "./lib/store.mjs";
 
@@ -8,7 +9,7 @@ const TOOLS = [
   {
     name: "soul_list",
     description: "列出所有人设卡、当前默认卡、工作区绑定和记忆设置。",
-    inputSchema: { type: "object", properties: {} },
+    inputSchema: { type: "object", properties: {} }
   },
   {
     name: "soul_read",
@@ -16,9 +17,9 @@ const TOOLS = [
     inputSchema: {
       type: "object",
       properties: {
-        name: { type: "string", description: "人设卡名称，不填则读取当前默认人设卡" },
-      },
-    },
+        name: { type: "string", description: "人设卡名称，不填则读取当前默认人设卡" }
+      }
+    }
   },
   {
     name: "soul_update",
@@ -28,9 +29,9 @@ const TOOLS = [
       required: ["name", "content"],
       properties: {
         name: { type: "string", description: "人设卡名称" },
-        content: { type: "string", description: "完整的人设卡 Markdown 内容" },
-      },
-    },
+        content: { type: "string", description: "完整的人设卡 Markdown 内容" }
+      }
+    }
   },
   {
     name: "soul_delete",
@@ -39,9 +40,9 @@ const TOOLS = [
       type: "object",
       required: ["name"],
       properties: {
-        name: { type: "string", description: "要删除的人设卡名称" },
-      },
-    },
+        name: { type: "string", description: "要删除的人设卡名称" }
+      }
+    }
   },
   {
     name: "soul_switch",
@@ -50,9 +51,9 @@ const TOOLS = [
       type: "object",
       properties: {
         name: { type: "string", description: "目标人设卡名称；传 '__none__' 表示禁用人设，传 '__inherit__'（仅工作区）表示取消工作区覆盖" },
-        workspace: { type: "string", description: "可选：工作区绝对路径。省略则切换全局默认人设卡" },
-      },
-    },
+        workspace: { type: "string", description: "可选：工作区绝对路径。省略则切换全局默认人设卡" }
+      }
+    }
   },
   {
     name: "soul_memory_toggle",
@@ -62,9 +63,9 @@ const TOOLS = [
       required: ["card"],
       properties: {
         card: { type: "string", description: "人设卡名称" },
-        enabled: { type: "boolean", description: "true 开启，false 关闭；省略则切换状态" },
-      },
-    },
+        enabled: { type: "boolean", description: "true 开启，false 关闭；省略则切换状态" }
+      }
+    }
   },
   {
     name: "memory_read",
@@ -74,9 +75,9 @@ const TOOLS = [
       properties: {
         topic: { type: "string", description: "主题名，'core' 读取核心记忆；留空则返回 core + 所有 topics 列表" },
         card: { type: "string", description: "可选：指定人设卡名称，默认当前默认卡" },
-        scope: { type: "string", enum: ["persona", "global"], description: "可选：记忆作用域" },
-      },
-    },
+        scope: { type: "string", enum: ["persona", "global"], description: "可选：记忆作用域" }
+      }
+    }
   },
   {
     name: "memory_append",
@@ -89,9 +90,9 @@ const TOOLS = [
         heading: { type: "string", description: "可选的小节简短标题" },
         content: { type: "string", description: "要记录的记忆正文" },
         card: { type: "string", description: "可选：指定人设卡名称" },
-        scope: { type: "string", enum: ["persona", "global"] },
-      },
-    },
+        scope: { type: "string", enum: ["persona", "global"] }
+      }
+    }
   },
   {
     name: "memory_rewrite",
@@ -103,9 +104,9 @@ const TOOLS = [
         topic: { type: "string", description: "目标主题名，默认 'core'" },
         content: { type: "string", description: "重写后的完整 Markdown 内容" },
         card: { type: "string", description: "可选：指定人设卡名称" },
-        scope: { type: "string", enum: ["persona", "global"] },
-      },
-    },
+        scope: { type: "string", enum: ["persona", "global"] }
+      }
+    }
   },
   {
     name: "memory_search",
@@ -116,10 +117,10 @@ const TOOLS = [
       properties: {
         query: { type: "string", description: "检索关键词" },
         card: { type: "string", description: "可选：指定人设卡名称" },
-        scope: { type: "string", enum: ["persona", "global"] },
-      },
-    },
-  },
+        scope: { type: "string", enum: ["persona", "global"] }
+      }
+    }
+  }
 ];
 
 function send(obj) {
@@ -179,36 +180,58 @@ rl.on("line", (line) => {
     return;
   }
   const { id, method, params } = req;
-  if (id === undefined || id === null) return;
-
+  if (id === undefined || id === null) {
+    // Notification (e.g. notifications/initialized)
+    return;
+  }
   try {
     switch (method) {
       case "initialize":
         sendResponse(id, {
           protocolVersion: params?.protocolVersion || "2024-11-05",
-          capabilities: { tools: {} },
-          serverInfo: { name: "soul-md", version: "2.0.0" },
+          capabilities: { tools: {}, resources: {} },
+          serverInfo: { name: "soul-md", version: "2.0.0" }
         });
         break;
       case "ping":
         sendResponse(id, {});
         break;
-      case "tools/list":
-        sendResponse(id, { tools: TOOLS });
+      case "tools/list": {
+        const sbTool = getSidebarToolDefinition("soul-md");
+        sendResponse(id, { tools: sbTool ? [...TOOLS, sbTool] : TOOLS });
         break;
+      }
+      case "resources/list": {
+        const sbRes = getSidebarResourceDefinition("soul-md");
+        sendResponse(id, { resources: sbRes ? [sbRes] : [] });
+        break;
+      }
+      case "resources/read": {
+        const uri = params?.uri;
+        if (uri === getSidebarResourceUri("soul-md")) {
+          sendResponse(id, buildSidebarResourceReadResult("soul-md"));
+        } else {
+          sendError(id, -32602, `Unknown resource: ${uri}`);
+        }
+        break;
+      }
       case "tools/call": {
         const toolName = params?.name;
+        if (toolName === "open_soul_md_ui") {
+          sendResponse(id, handleSidebarToolCall("soul-md"));
+          break;
+        }
         const toolArgs = params?.arguments || {};
         try {
           const result = dispatchTool(toolName, toolArgs);
           sendResponse(id, {
             content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
-            isError: false,
+            isError: false
           });
         } catch (err) {
           sendResponse(id, {
             content: [{ type: "text", text: `Error (${toolName}): ${err.message || String(err)}` }],
-            isError: true,
+            isError: true
           });
         }
         break;

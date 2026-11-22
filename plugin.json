@@ -2,18 +2,12 @@
   "$schema": "https://antigravity.google/schemas/v1/plugin.json",
   "name": "soul-md",
   "displayName": "苍蓝魂匣",
-  "version": "2.2.2",
-  "description": "Multi-persona card switcher and layered file memory (core.md + topics/*.md) plugin for Antigravity with workspace binding and visual Soul.md Studio panel.",
+  "version": "2.3.0",
   "logo": "assets/logo.svg",
+  "description": "仿 dsh-soul-md 的多人设卡与分层文件记忆插件：支持创建/编辑/一键切换人设卡、工作区专属人设绑定、按人设独立 core.md + topics 记忆，自带右侧可视化管理面板。",
   "suggestedPrompts": [
     "列出当前所有人设卡，帮我切换到另一张人设卡",
     "为当前工作区绑定一张专属人设卡",
     "把我的新偏好记进 core 记忆或新建一个主题记忆"
-  ],
-  "author": {
-    "name": "A16Nights",
-    "url": "https://github.com/A16Nights"
-  },
-  "homepage": "https://github.com/A16Nights/antigravity-soul-md",
-  "repository": "https://github.com/A16Nights/antigravity-soul-md"
+  ]
 }
