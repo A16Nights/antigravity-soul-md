@@ -21,7 +21,7 @@
 </p>
 
 <p>
-  <a href="#features">✨ 功能全景</a> &nbsp;·&nbsp; <a href="#architecture">🧩 工作原理</a> &nbsp;·&nbsp; <a href="#installation">🚀 快速安装</a> &nbsp;·&nbsp; <a href="#mcp-tools">🧰 MCP 工具</a> &nbsp;·&nbsp; <a href="#storage">📂 数据存储</a> &nbsp;·&nbsp; <a href="#azure-suite">🌌 苍蓝全家桶</a>
+  <a href="#preview">🖼️ 界面预览</a> &nbsp;·&nbsp; <a href="#features">✨ 功能全景</a> &nbsp;·&nbsp; <a href="#architecture">🧩 工作原理</a> &nbsp;·&nbsp; <a href="#installation">🚀 快速安装</a> &nbsp;·&nbsp; <a href="#mcp-tools">🧰 MCP 工具</a> &nbsp;·&nbsp; <a href="#storage">📂 数据存储</a> &nbsp;·&nbsp; <a href="#azure-suite">🌌 苍蓝全家桶</a>
 </p>
 
 </div>
@@ -50,6 +50,19 @@
 </td>
 </tr>
 </table>
+
+<h2 id="preview">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/readme/sec-preview-dark.svg">
+  <img src="assets/readme/sec-preview-light.svg" alt="界面预览" width="100%">
+</picture>
+</h2>
+
+<p align="center">
+  <a href="assets/readme/preview-panel.png"><img src="assets/readme/preview-panel.png" alt="苍蓝魂匣 Soul.md 人设工坊预览" width="90%"></a>
+  <br><strong>苍蓝魂匣 · Soul.md 多人设卡热切换与在线编辑工坊</strong>
+  <br><sub>外接模型智能身份锚强化开关、单人设独立记忆开关、一键设为默认并原子同步全局规则，支持在线编辑保存</sub>
+</p>
 
 <h2 id="features">
 <picture>

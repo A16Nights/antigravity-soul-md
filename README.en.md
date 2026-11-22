@@ -21,7 +21,7 @@
 </p>
 
 <p>
-  <a href="#features">✨ Features</a> &nbsp;·&nbsp; <a href="#architecture">🧩 Architecture</a> &nbsp;·&nbsp; <a href="#installation">🚀 Quick Start</a> &nbsp;·&nbsp; <a href="#mcp-tools">🧰 MCP Tools</a> &nbsp;·&nbsp; <a href="#storage">📂 Storage</a> &nbsp;·&nbsp; <a href="#azure-suite">🌌 Azure Suite</a>
+  <a href="#preview">🖼️ Preview</a> &nbsp;·&nbsp; <a href="#features">✨ Features</a> &nbsp;·&nbsp; <a href="#architecture">🧩 Architecture</a> &nbsp;·&nbsp; <a href="#installation">🚀 Quick Start</a> &nbsp;·&nbsp; <a href="#mcp-tools">🧰 MCP Tools</a> &nbsp;·&nbsp; <a href="#storage">📂 Storage</a> &nbsp;·&nbsp; <a href="#azure-suite">🌌 Azure Suite</a>
 </p>
 
 </div>
@@ -50,6 +50,19 @@ Always-on <code>core.md</code> + topical <code>topics/*.md</code> with <code>per
 </td>
 </tr>
 </table>
+
+<h2 id="preview">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/readme/sec-preview-en-dark.svg">
+  <img src="assets/readme/sec-preview-en-light.svg" alt="Interface Preview" width="100%">
+</picture>
+</h2>
+
+<p align="center">
+  <a href="assets/readme/preview-panel.png"><img src="assets/readme/preview-panel.png" alt="Soul.md Studio Panel Preview" width="90%"></a>
+  <br><strong>Soul.md Studio · Multi-Persona Hot Switcher &amp; Inline Editor</strong>
+  <br><sub>Smart external-model anchor guard, per-persona memory toggles, one-click default switch with atomic rule sync &amp; live editor</sub>
+</p>
 
 <h2 id="features">
 <picture>
