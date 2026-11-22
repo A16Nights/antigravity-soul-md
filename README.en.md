@@ -1,83 +1,207 @@
-# Antigravity Soul.md Studio (Soul.md 人设工坊)
+<div align="center">
 
-**English** | [简体中文](README.md)
+<p>🌐 &nbsp; <a href="README.md">简体中文</a> &nbsp;·&nbsp; <strong>English</strong></p>
 
-> **Multi-persona card switcher, workspace persona overrides, and layered Markdown file memory (`core.md` + `topics/*.md`) for Google Antigravity.**
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/readme/hero-en-dark.svg">
+  <img src="assets/readme/hero-en-light.svg" alt="Soul.md Studio · Azure Suite" width="100%">
+</picture>
 
-Bring switchable persona cards, per-workspace persona overrides, isolated per-persona layered file memory, and a visual **Soul.md Studio** side pane panel to **Google Antigravity** — built with zero external dependencies in pure Node.js.
+<p>
+  [![Release](https://img.shields.io/github/v/release/A16Nights/antigravity-soul-md?style=flat-square&label=Release&color=818cf8&labelColor=1e293b)](https://github.com/A16Nights/antigravity-soul-md/releases)
+  [![Stars](https://img.shields.io/github/stars/A16Nights/antigravity-soul-md?style=flat-square&label=Stars&color=f59e0b&labelColor=1e293b)](https://github.com/A16Nights/antigravity-soul-md/stargazers)
+  ![Antigravity](https://img.shields.io/badge/Google_Antigravity-Native_Plugin-818cf8?style=flat-square&labelColor=1e293b)
+  ![Node.js](https://img.shields.io/badge/Node.js-%3E%3D22.0.0-10b981?style=flat-square&labelColor=1e293b)
+  ![Zero Deps](https://img.shields.io/badge/Dependencies-Zero-06b6d4?style=flat-square&labelColor=1e293b)
+  [![License](https://img.shields.io/badge/License-MIT-6366f1?style=flat-square&labelColor=1e293b)](./LICENSE)
+</p>
 
----
+<p>
+  <strong>Hot-swappable persona cards, workspace binding, smart external-model PreInvocation identity anchor, and layered Markdown memory</strong>
+</p>
 
-## ✨ Key Features
+<p>
+  <a href="#features">✨ Features</a> &nbsp;·&nbsp; <a href="#architecture">🧩 Architecture</a> &nbsp;·&nbsp; <a href="#installation">🚀 Quick Start</a> &nbsp;·&nbsp; <a href="#mcp-tools">🧰 MCP Tools</a> &nbsp;·&nbsp; <a href="#storage">📂 Storage</a> &nbsp;·&nbsp; <a href="#azure-suite">🌌 Azure Suite</a>
+</p>
 
-- **Multi-Persona Cards & Instant Switching**: Create, edit, delete, and switch the active default persona card. Changes automatically sync to the active rule file and take effect on the next conversation turn.
-- **Per-Workspace Persona Binding**: Assign a dedicated persona card (or disable personas) for any workspace directory by writing `<workspace>/.agents/rules/soul-md.md`; unbinding cleans up the managed rule file automatically.
-- **Layered File Memory (`core.md` + `topics/*.md`)**:
-  - `core.md` is injected alongside the active persona card (with configurable character budget protection).
-  - `topics/*.md` stores topical memories on disk for on-demand reading and keyword search.
-  - Supports both `persona` (isolated per card) and `global` scopes, plus per-card memory enable/disable toggles.
-- **10 MCP Tools**: Allows the agent to inspect, evolve, and switch persona cards and memories during conversation.
-- **Soul.md Studio Sidecar UI**: Visual sidecar panel (and browser full-screen view) with dark/light themes, card editor, workspace binder, and layered memory inspector.
+</div>
 
----
+**Soul.md Studio** brings hot-swappable multi-persona management, per-workspace persona overrides, external-model-aware `PreInvocation` identity anchor reinforcement, per-persona toggleable layered Markdown memory (`core.md` + `topics/*.md`), and a visual Sidecar + Web UI workbench to **Google Antigravity**—with zero third-party dependencies.
 
-## 🚀 Installation
+<table>
+<tr>
+<td width="50%" valign="top">
+<h4>💎 Hot-Swappable Persona Cards</h4>
+Create and edit Markdown persona cards right inside the panel; switching the default card atomically syncs <code>rules/AGENTS.md</code> for immediate effect.
+</td>
+<td width="50%" valign="top">
+<h4>🛡️ Smart External-Model Anchor</h4>
+Supports <code>&lt;!-- soul-md-anchor-start/end --&gt;</code> compact anchors; <code>external-model-guard</code> injects per-turn anchors only on external models.
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+<h4>📁 Per-Workspace Binding</h4>
+Bind dedicated persona cards to specific workspaces via managed <code>.agents/rules/soul-md.md</code> files—unbinding never touches hand-written rules.
+</td>
+<td width="50%" valign="top">
+<h4>🧠 Layered File Memory & Toggles</h4>
+Always-on <code>core.md</code> + topical <code>topics/*.md</code> with <code>persona</code>/<code>global</code> scopes and per-card memory toggles synced with Lanxi Memory.
+</td>
+</tr>
+</table>
 
-> Prerequisite: **Node.js >= 22.0.0**.
+<h2 id="features">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/readme/sec-features-en-dark.svg">
+  <img src="assets/readme/sec-features-en-light.svg" alt="Feature Overview" width="100%">
+</picture>
+</h2>
 
-### Option A: Git Clone (Recommended)
-```bash
-# macOS / Linux
-git clone https://github.com/A16Nights/antigravity-soul-md.git ~/.gemini/config/plugins/soul-md
+### 1. Multi-Persona Cards & Instant Hot Switching
+- **In-Panel Authoring**: Create and edit Markdown persona cards using native glass modals (`azurePrompt`) and switch the global default persona in one click.
+- **Atomic Rule Sync**: Saving or switching the default persona atomically updates `rules/AGENTS.md`, taking effect on the very next turn.
+- **Safe Deletion**: Deleting a card requires double confirmation and preserves its historical memory files by default.
 
-# Windows PowerShell
-git clone https://github.com/A16Nights/antigravity-soul-md.git "$env:USERPROFILE\.gemini\config\plugins\soul-md"
+### 2. Smart External-Model Detection & `PreInvocation` Identity Anchor
+- **Compact Anchor Blocks**: Mark concise identity anchors with `<!-- soul-md-anchor-start --> ... <!-- soul-md-anchor-end -->` (auto-extracts the leading core block when omitted).
+- **External-Model Guard (`external-model-guard`)**: Detects the active primary model before each turn—injecting identity anchors + `core.md` for external custom models to stop persona drift, while skipping redundant injection on native Antigravity models. Toggleable in the top bar.
+
+### 3. Per-Workspace Persona Binding
+- Bind a specific persona card to any workspace directory (managed via `<workspace>/.agents/rules/soul-md.md`) to override the global default inside that project.
+- Unbinding removes only files carrying the plugin's managed header, leaving user-authored rules untouched.
+
+### 4. Layered Markdown Memory (`core.md` + `topics/*.md`) & Per-Card Toggles
+- **Two-Layer Storage**: `core.md` (always-injected core memory with character budget guard) and `topics/*.md` (on-demand topical memories searchable and appendable via UI or MCP).
+- **Dual Scopes**: `persona` (strictly isolated per card) and `global` (shared background across cards).
+- **Per-Card Memory Toggle (`soul_memory_toggle`)**: Enable or disable memory independently per persona card, automatically coordinating with **[Lanxi Memory](https://github.com/A16Nights/antigravity-lanxi-memory)**.
+
+### 5. Two-Way Integration with Azure Compass
+- Switching modes in **[Azure Compass](https://github.com/A16Nights/antigravity-azure-compass)** can automatically switch Soul.md to the bound persona card.
+
+### 6. Unified Azure Suite UI
+- **Neko Glass UI & Shared Theme Center**: Dark/light themes, custom glass dropdowns & modals, 6 official presets + dual custom pickers + 4 shared slots, sidebar toggle, fullscreen `Web UI`, and GitHub Release update checks.
+
+<h2 id="architecture">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/readme/sec-arch-en-dark.svg">
+  <img src="assets/readme/sec-arch-en-light.svg" alt="How It Works" width="100%">
+</picture>
+</h2>
+
+```mermaid
+flowchart TD
+  W{"Workspace Binding Exists?"} -->|"Yes"| P1["Workspace Persona<br/>.agents/rules/soul-md.md"]
+  W -->|"No"| P2["Global Default Persona<br/>cards/&lt;default&gt;.md → rules/AGENTS.md"]
+  P1 & P2 --> G{"PreInvocation<br/>external-model-guard"}
+  G -->|"External Model"| INJ["Inject Identity Anchor<br/>+ core.md Memory"]
+  G -->|"Native Model"| SKIP["Static Rules Only · Zero Overhead"]
+  P1 & P2 -.->|"Per-Card Memory Switch"| MEM["Layered core.md + topics/*.md<br/>&amp; Lanxi Memory Sync"]
 ```
 
-### Option B: Download Release Zip
-1. Download the latest `soul-md-v*.zip` from [GitHub Releases](https://github.com/A16Nights/antigravity-soul-md/releases/latest).
-2. Extract it into your Antigravity plugins folder (`~/.gemini/config/plugins/` on macOS/Linux or `%USERPROFILE%\.gemini\config\plugins\` on Windows).
+<h2 id="installation">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/readme/sec-install-en-dark.svg">
+  <img src="assets/readme/sec-install-en-light.svg" alt="Installation & Setup" width="100%">
+</picture>
+</h2>
 
-### Activate
-Restart **Google Antigravity** completely, verify **Soul.md 人设工坊** is enabled under **Customizations**, or click `[Soul.md 人设工坊](sidecar://soul-md/studio/)` to open the Studio panel.
+> **Prerequisite**: **Node.js >= 22.0.0** (zero third-party npm dependencies, pure native ESM).
 
----
+### Option 1 · Let Antigravity Install It for You (Recommended)
 
-## 🧭 Persona Resolution Precedence
+Copy and send the following prompt directly to Antigravity:
 
-1. **Workspace Override** (`<workspace>/.agents/rules/soul-md.md`)
-2. **Global Default Persona** (synced from `~/.gemini/soul-md/cards/<default>.md`)
-3. **Disabled / None**: falls back to a concise default engineering assistant style
+> Please clone `https://github.com/A16Nights/antigravity-soul-md.git` into my Antigravity global plugins directory as `soul-md`, verify the directory structure, and tell me once it is ready so I can press `Ctrl+R` to reload.
 
----
+### Option 2 · Manual Git Clone
 
-## 🧰 MCP Tools (10 Tools)
+```powershell
+# Windows (PowerShell)
+git clone https://github.com/A16Nights/antigravity-soul-md.git "$env:USERPROFILE\.gemini\config\plugins\soul-md"
+
+# macOS / Linux
+git clone https://github.com/A16Nights/antigravity-soul-md.git ~/.gemini/config/plugins/soul-md
+```
+
+Restart or reload Antigravity (`Ctrl+R`), enable **Soul.md Studio** in **Plugins**, and open it from the left sidebar or right-hand panel.
+
+<h2 id="mcp-tools">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/readme/sec-tools-en-dark.svg">
+  <img src="assets/readme/sec-tools-en-light.svg" alt="MCP Tools Reference" width="100%">
+</picture>
+</h2>
 
 | Tool | Description |
 | --- | --- |
-| `soul_list` | List all persona cards, default card, workspace bindings, and memory toggles |
-| `soul_read` | Read the Markdown content of a specific or default persona card |
-| `soul_update` | Create or update a persona card and sync active rule files |
-| `soul_delete` | Delete a persona card (existing memory files are preserved on disk) |
-| `soul_switch` | Switch the global default card, or bind/unbind a workspace override (`__none__` / `__inherit__`) |
-| `soul_memory_toggle` | Enable or disable layered memory per persona card |
-| `memory_read` | Read `core.md` or `topics/<topic>.md` (returns `core` + topic index when `topic` is omitted) |
-| `memory_append` | Append a timestamped section (`## YYYY-MM-DD HH:mm`) to `core` or a topic |
-| `memory_rewrite` | Consolidate and rewrite a memory file cleanly |
-| `memory_search` | Search keywords across `core.md` and all `topics/*.md` files |
+| `soul_list` | List all persona cards, global default, workspace bindings, and per-card memory toggle states |
+| `soul_read` | Read full Markdown content of a specified (or currently active) persona card |
+| `soul_update` | Create or update a persona card; auto-syncs `rules/AGENTS.md` when editing the active default |
+| `soul_delete` | Delete a persona card (retains its historical memory files by default) |
+| `soul_switch` | Switch the global default persona or bind/unbind a workspace-specific persona |
+| `soul_memory_toggle` | Enable or disable long-term memory read/write/injection per persona card |
+| `memory_read` | Read `core.md` or `topics/<topic>.md` in `persona` or `global` scope |
+| `memory_append` | Append a timestamped memory entry to `core.md` or `topics/<topic>.md` |
+| `memory_rewrite` | Consolidate, compact, and rewrite `core.md` or a topical memory file |
+| `memory_search` | Keyword-search across `core.md` and all `topics/*.md` files |
+
+### 🧭 Persona Resolution Priority
+
+1. **Workspace Binding** (`<workspace>/.agents/rules/soul-md.md`)
+2. **Global Default Persona Card** (`~/.gemini/soul-md/cards/<default>.md` → synced to `rules/AGENTS.md`)
+3. **Fallback**: Concise, rigorous default engineering assistant when no default card is active
+
+<h2 id="storage">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/readme/sec-storage-en-dark.svg">
+  <img src="assets/readme/sec-storage-en-light.svg" alt="Data & Configuration" width="100%">
+</picture>
+</h2>
+
+<details open>
+<summary><strong>Click to inspect local data paths & shared Azure Suite configs</strong></summary>
+
+<br>
+
+- **Persona Cards**: `~/.gemini/soul-md/cards/*.md`
+- **Layered Memory**: `~/.gemini/soul-md/memory/personas/<card>/` and `memory/global/`
+- **Global Config**: `~/.gemini/soul-md/config.json`
+- **Shared Azure Suite Theme & Sidebar Config**: `~/.gemini/azure-theme.json`, `~/.gemini/azure-sidebar-nav.json`
+
+</details>
+
+<h2 id="azure-suite">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/readme/sec-suite-en-dark.svg">
+  <img src="assets/readme/sec-suite-en-light.svg" alt="Azure Suite Ecosystem" width="100%">
+</picture>
+</h2>
+
+All **8 Azure Suite plugins** share a unified **Neko Glass UI**, synchronized **Azure Theme Center** (`~/.gemini/azure-theme.json`), and customizable **Sidebar Navigation Hub** (`~/.gemini/azure-sidebar-nav.json`):
+
+| Plugin | Repository | Core Capability |
+| --- | --- | --- |
+| ✦ **External Orchestrator** | [antigravity-external-orchestrator](https://github.com/A16Nights/antigravity-external-orchestrator) | Multi-provider external worker routing, custom profiles, circuit breaker & live monitoring |
+| 🪐 **Azure Orbit** | [antigravity-azure-orbit](https://github.com/A16Nights/antigravity-azure-orbit) | Mount external LLM APIs directly into Antigravity's native bottom-left model selector |
+| 🧭 **Azure Compass** | [antigravity-azure-compass](https://github.com/A16Nights/antigravity-azure-compass) | Agent mode presets, live context telemetry with auto /compact & Azure Suite sidebar hub |
+| 🏛️ **Azure Corridor** | [antigravity-azure-corridor](https://github.com/A16Nights/antigravity-azure-corridor) | Read-only FTS5 conversation search, custom project groups, priority tags & safe archive |
+| 🌌 **Lanxi Memory** | [antigravity-lanxi-memory](https://github.com/A16Nights/antigravity-lanxi-memory) | 5-layer Markdown cognitive graph, CJK FTS5, tidal forgetting curves & starfield UI |
+| 💎 **Soul.md Studio** &nbsp;`✦ This Repo` | [antigravity-soul-md](https://github.com/A16Nights/antigravity-soul-md) | Hot-swappable persona cards, workspace binding, external-model anchor & layered memory |
+| 💭 **Think-ZH** | [antigravity-think-zh](https://github.com/A16Nights/antigravity-think-zh) | Simplified Chinese / English reasoning switcher with dual-channel anti-drift hooks |
+| 🔮 **Azure Prism** | [antigravity-azure-prism](https://github.com/A16Nights/antigravity-azure-prism) | Native MCP App Chain-of-Thought viewer with keyless zero-token MT & LLM translation |
 
 ---
 
-## 🔒 Privacy & Testing
+### 💡 Acknowledgements
 
-- All persona cards and memories are stored locally as plain Markdown files under `~/.gemini/soul-md/`. Zero telemetry, zero network requests.
-- Run automated tests: `npm test` (verified in isolated temporary directories).
+Independently built on the native Antigravity plugin protocol, inspired by:
+- [dsh-soul-md](https://github.com/Scorp1o117/dsh-soul-md) — Multi-persona cards, workspace overrides, and `core.md` + `topics/*.md` layered memory
 
 ---
 
-## 💡 Inspiration & Credits
+<div align="center">
 
-This plugin is an independent native implementation for Google Antigravity, inspired by:
-- [dsh-soul-md](https://github.com/Scorp1o117/dsh-soul-md) — multi-persona cards, workspace overrides, and `core.md` + `topics/*.md` layered file memory design
+📄 Released under the **[MIT License](./LICENSE)** · Crafted for **Google Antigravity**
 
-MIT License © 2026 A16Nights
+</div>

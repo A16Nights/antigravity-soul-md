@@ -1,14 +1,62 @@
-# 苍蓝魂匣 · Soul.md（Antigravity Soul.md Studio · `antigravity-soul-md`）
+<div align="center">
 
-**简体中文** | [English](README.en.md)
+<p>🌐 &nbsp; <strong>简体中文</strong> &nbsp;·&nbsp; <a href="README.en.md">English</a></p>
 
-> **Multi-persona card switcher, workspace persona binding, external-model smart PreInvocation anchor hook, and layered Markdown file memory (`core.md` + `topics/*.md`) for Google Antigravity.**
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/readme/hero-dark.svg">
+  <img src="assets/readme/hero-light.svg" alt="苍蓝魂匣 · Soul.md Studio" width="100%">
+</picture>
+
+<p>
+  [![Release](https://img.shields.io/github/v/release/A16Nights/antigravity-soul-md?style=flat-square&label=Release&color=818cf8&labelColor=1e293b)](https://github.com/A16Nights/antigravity-soul-md/releases)
+  [![Stars](https://img.shields.io/github/stars/A16Nights/antigravity-soul-md?style=flat-square&label=Stars&color=f59e0b&labelColor=1e293b)](https://github.com/A16Nights/antigravity-soul-md/stargazers)
+  ![Antigravity](https://img.shields.io/badge/Google_Antigravity-Native_Plugin-818cf8?style=flat-square&labelColor=1e293b)
+  ![Node.js](https://img.shields.io/badge/Node.js-%3E%3D22.0.0-10b981?style=flat-square&labelColor=1e293b)
+  ![Zero Deps](https://img.shields.io/badge/Dependencies-Zero-06b6d4?style=flat-square&labelColor=1e293b)
+  [![License](https://img.shields.io/badge/License-MIT-6366f1?style=flat-square&labelColor=1e293b)](./LICENSE)
+</p>
+
+<p>
+  <strong>多人设卡热切换 · 工作区专属绑定 · 外接模型智能防掉人设锚点 · 分层文件记忆（core.md + topics/*.md）</strong>
+</p>
+
+<p>
+  <a href="#features">✨ 功能全景</a> &nbsp;·&nbsp; <a href="#architecture">🧩 工作原理</a> &nbsp;·&nbsp; <a href="#installation">🚀 快速安装</a> &nbsp;·&nbsp; <a href="#mcp-tools">🧰 MCP 工具</a> &nbsp;·&nbsp; <a href="#storage">📂 数据存储</a> &nbsp;·&nbsp; <a href="#azure-suite">🌌 苍蓝全家桶</a>
+</p>
+
+</div>
 
 **苍蓝魂匣（Soul.md）** 为 **Google Antigravity** 提供可热切换的多人设卡管理、工作区专属人设绑定、外接模型智能识别的 `PreInvocation` 底层身份锚防掉线强化、按人设独立开关的分层文件记忆（`core.md` + `topics/*.md`），以及可视化侧栏工作台（Sidecar + 独立 Web UI）。零第三方依赖，纯 Node.js 原生运行。
 
----
+<table>
+<tr>
+<td width="50%" valign="top">
+<h4>💎 多人设卡管理与一键热切换</h4>
+面板内毛玻璃弹窗随时新建/编辑 Markdown 人设卡，切换默认卡自动原子同步写入 <code>rules/AGENTS.md</code>，下一轮对话即刻生效。
+</td>
+<td width="50%" valign="top">
+<h4>🛡️ 外接模型智能身份锚防掉线</h4>
+支持 <code>&lt;!-- soul-md-anchor-start/end --&gt;</code> 浓缩身份锚，通过 <code>external-model-guard</code> 仅在外接模型下每轮强化注入，原生模型零额外开销。
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+<h4>📁 工作区专属人设绑定</h4>
+为指定项目目录生成受管 <code>.agents/rules/soul-md.md</code> 覆盖全局默认人设；解绑时仅清理插件受管文件，绝不误删手写规则。
+</td>
+<td width="50%" valign="top">
+<h4>🧠 分层文件记忆 & 单卡独立开关</h4>
+支持 <code>core.md</code> 常驻核心记忆 + <code>topics/*.md</code> 主题记忆、<code>persona</code>/<code>global</code> 双作用域，并与蓝汐自动联动记忆开关。
+</td>
+</tr>
+</table>
 
-## ✨ 功能全景
+<h2 id="features">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/readme/sec-features-dark.svg">
+  <img src="assets/readme/sec-features-light.svg" alt="功能全景" width="100%">
+</picture>
+</h2>
 
 ### 1. 多人设卡管理与一键热切换
 - **自由创建与在线编辑**：通过面板内毛玻璃输入弹窗（`azurePrompt`）随时新建人设卡、在线编写 Markdown 设定并实时保存，支持一键切换全局默认人设卡。
@@ -39,13 +87,39 @@
 ### 6. 苍蓝统一视觉与交互体系
 - **Neko Glass 毛玻璃界面 & 苍蓝主题色调中心**：深色/浅色切换、自定义毛玻璃下拉框（`AzureSelect`）与新建/删除面板内弹窗、6 套官方配色预设 + 自定义双色 + 4 个自定义栏位跨插件同步、左侧栏快捷入口开关、独立浏览器全屏 `Web UI` 与 GitHub Release 在线更新检查。
 
----
+<h2 id="architecture">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/readme/sec-arch-dark.svg">
+  <img src="assets/readme/sec-arch-light.svg" alt="工作原理与架构" width="100%">
+</picture>
+</h2>
 
-## 🚀 快速安装
+```mermaid
+flowchart TD
+  W{"当前工作区有专属绑定?"} -->|"是"| P1["工作区人设<br/>.agents/rules/soul-md.md"]
+  W -->|"否"| P2["全局默认人设卡<br/>cards/&lt;default&gt;.md → rules/AGENTS.md"]
+  P1 & P2 --> G{"PreInvocation<br/>external-model-guard"}
+  G -->|"外接模型"| INJ["注入浓缩身份锚<br/>+ core.md 核心记忆"]
+  G -->|"原生模型"| SKIP["依赖静态规则 · 零额外 Token"]
+  P1 & P2 -.->|"单卡记忆开关"| MEM["分层记忆 core.md + topics/*.md<br/>&amp; 蓝汐认知图谱联动"]
+```
 
-> 前置要求：**Node.js >= 22.0.0**（零第三方 npm 依赖）。
+<h2 id="installation">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/readme/sec-install-dark.svg">
+  <img src="assets/readme/sec-install-light.svg" alt="快速安装与上手" width="100%">
+</picture>
+</h2>
 
-将本仓库克隆到 Antigravity 全局插件目录（目录名固定为 `soul-md`）：
+> **前置要求**：**Node.js >= 22.0.0**（零第三方 npm 运行时依赖，纯 Node.js 原生 ESM 实现）。
+
+### 方式一 · 一句话让 Antigravity 帮你自动安装（推荐）
+
+直接把下面这句话发给 Antigravity 即可自动完成克隆与核验：
+
+> 帮我把 `https://github.com/A16Nights/antigravity-soul-md.git` 克隆到本机 Antigravity 全局插件目录，目录名设为 `soul-md`，检查目录无误后告诉我，我再按 `Ctrl+R` 重载生效。
+
+### 方式二 · 命令行手动克隆
 
 ```powershell
 # Windows (PowerShell)
@@ -57,17 +131,12 @@ git clone https://github.com/A16Nights/antigravity-soul-md.git ~/.gemini/config/
 
 重启或重载 Antigravity（`Ctrl+R`），在 **Plugins** 页面启用 **苍蓝魂匣** 即可从左侧栏或右侧辅助面板打开。
 
----
-
-## 🧭 人设生效优先级
-
-1. **当前工作区专属绑定**（`<workspace>/.agents/rules/soul-md.md`）
-2. **全局默认人设卡**（`~/.gemini/soul-md/cards/<default>.md` → 同步至 `rules/AGENTS.md`）
-3. **无默认卡或禁用**：自动回退为简洁严谨的默认工程助手
-
----
-
-## 🧰 MCP 工具一览（10 个）
+<h2 id="mcp-tools">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/readme/sec-tools-dark.svg">
+  <img src="assets/readme/sec-tools-light.svg" alt="MCP 工具一览" width="100%">
+</picture>
+</h2>
 
 | 工具名 | 作用 |
 | --- | --- |
@@ -82,22 +151,62 @@ git clone https://github.com/A16Nights/antigravity-soul-md.git ~/.gemini/config/
 | `memory_rewrite` | 整理、压缩并重写 `core.md` 或指定主题记忆文件正文 |
 | `memory_search` | 跨 `core.md` 与所有 `topics/*.md` 按关键词快速检索历史记忆片段 |
 
----
+### 🧭 人设生效优先级
 
-## 📂 数据与配置存储
+1. **当前工作区专属绑定**（`<workspace>/.agents/rules/soul-md.md`）
+2. **全局默认人设卡**（`~/.gemini/soul-md/cards/<default>.md` → 同步至 `rules/AGENTS.md`）
+3. **无默认卡或禁用**：自动回退为简洁严谨的默认工程助手
+
+<h2 id="storage">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/readme/sec-storage-dark.svg">
+  <img src="assets/readme/sec-storage-light.svg" alt="数据与配置存储" width="100%">
+</picture>
+</h2>
+
+<details open>
+<summary><strong>点击展开查看本机数据目录与苍蓝套件共享配置路径</strong></summary>
+
+<br>
 
 - **人设卡存储目录**：`~/.gemini/soul-md/cards/*.md`
 - **分层记忆存储目录**：`~/.gemini/soul-md/memory/personas/<card>/` 与 `memory/global/`
 - **魂匣全局配置**：`~/.gemini/soul-md/config.json`
 - **苍蓝套件共享主题 / 左侧栏配置**：`~/.gemini/azure-theme.json`、`~/.gemini/azure-sidebar-nav.json`
 
+</details>
+
+<h2 id="azure-suite">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/readme/sec-suite-dark.svg">
+  <img src="assets/readme/sec-suite-light.svg" alt="苍蓝套件全家桶" width="100%">
+</picture>
+</h2>
+
+**苍蓝套件（Azure Suite）** 8 款插件共享统一的 **Neko Glass 毛玻璃界面**、跨插件同步的 **苍蓝主题色调中心**（`~/.gemini/azure-theme.json`）以及可自由开关的 **左侧栏快捷入口**（`~/.gemini/azure-sidebar-nav.json`）：
+
+| 插件 | 仓库 | 核心能力 |
+| --- | --- | --- |
+| ✦ **苍蓝协奏台** | [antigravity-external-orchestrator](https://github.com/A16Nights/antigravity-external-orchestrator) | 多渠道外部模型协同调度、自定义调度角色、容灾断路器与全链路实时监控 |
+| 🪐 **苍蓝星轨** | [antigravity-azure-orbit](https://github.com/A16Nights/antigravity-azure-orbit) | 将外部大模型直接挂载进 Antigravity 左下角原生模型下拉菜单担任主脑 |
+| 🧭 **苍蓝罗盘** | [antigravity-azure-compass](https://github.com/A16Nights/antigravity-azure-compass) | Agent 工作模式预设中心、上下文水位监测与自动 /compact、苍蓝套件左侧栏总控 |
+| 🏛️ **苍蓝回廊** | [antigravity-azure-corridor](https://github.com/A16Nights/antigravity-azure-corridor) | 只读原生会话 FTS5 全文检索、自定义项目分组、优先级标签与独立安全归档箱 |
+| 🌌 **蓝汐 · 潮汐认知图谱** | [antigravity-lanxi-memory](https://github.com/A16Nights/antigravity-lanxi-memory) | 五层纯 Markdown 真源记忆、CJK FTS5、潮汐遗忘曲线与交互式潮汐星海图谱 |
+| 💎 **苍蓝魂匣** &nbsp;`✦ 当前仓库` | [antigravity-soul-md](https://github.com/A16Nights/antigravity-soul-md) | 多人设卡热切换、工作区专属绑定、外接模型智能防掉线锚点与分层文件记忆 |
+| 💭 **思语中文** | [antigravity-think-zh](https://github.com/A16Nights/antigravity-think-zh) | 内部思考语言简体中文 / 英文双档热切换、双通道防漂移与实时注入预览 |
+| 🔮 **苍蓝棱镜** | [antigravity-azure-prism](https://github.com/A16Nights/antigravity-azure-prism) | 原生 MCP App 思维链实时观测、免密钥零 Token 机翻与外部模型双通道译文 |
+
 ---
 
-## 💡 灵感致谢
+### 💡 灵感致谢
 
 本项目为基于 Antigravity 插件协议独立设计与编写的原生实现，功能设计灵感源自：
 - [dsh-soul-md](https://github.com/Scorp1o117/dsh-soul-md) —— 多人设卡、工作区覆盖及 `core.md` + `topics/*.md` 分层记忆理念
 
-## 📄 License
+---
 
-[MIT](./LICENSE)
+<div align="center">
+
+📄 Released under the **[MIT License](./LICENSE)** · Crafted for **Google Antigravity**
+
+</div>
