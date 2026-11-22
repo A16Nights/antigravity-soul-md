@@ -1,6 +1,6 @@
 {
   "name": "antigravity-soul-md",
-  "version": "2.3.1",
+  "version": "2.3.2",
   "description": "Multi-persona card switcher and layered file memory plugin for Antigravity with Soul.md Studio sidecar UI.",
   "type": "module",
   "license": "MIT",
