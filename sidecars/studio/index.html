@@ -353,13 +353,17 @@
       const statusAnchor = document.getElementById("anchor-reinforce-status");
       if (chkAnchor) chkAnchor.checked = anchorOn;
       if (statusAnchor) statusAnchor.textContent = anchorOn ? "当前：已开启（外接模型）" : "当前：已关闭";
+      const prevSelected = selectedCard;
       if (!selectedCard || !state.cards.some((c) => c.name === selectedCard)) {
         selectedCard = state.defaultCard || (state.cards[0] && state.cards[0].name) || null;
       }
       renderCards();
       renderWorkspaces();
       renderMemSelectors();
-      if (selectedCard) await selectCard(selectedCard);
+      // 若用户当前正在编辑同一张人设卡且有未保存改动，不静默覆盖编辑器内容
+      if (selectedCard && (!cardEditorDirty || selectedCard !== prevSelected)) {
+        await selectCard(selectedCard);
+      }
     }
 
     function renderCards() {
@@ -394,21 +398,38 @@
       }
     }
 
+    let cardEditorDirty = false;
+    let selectCardSeq = 0;
+    const _cardEditorEl = document.getElementById("card-editor");
+    if (_cardEditorEl) _cardEditorEl.addEventListener("input", () => { cardEditorDirty = true; });
+
     async function selectCard(name) {
       selectedCard = name;
+      const seq = ++selectCardSeq;
       try { window.AzureTone?.applySeed(name); } catch {}
       renderCards();
-      const data = await api("/api/card?name=" + encodeURIComponent(name));
-      document.getElementById("editor-title").textContent = "编辑人设卡：" + name;
-      document.getElementById("card-editor").value = data.content || "";
+      try {
+        const data = await api("/api/card?name=" + encodeURIComponent(name));
+        if (seq !== selectCardSeq || name !== selectedCard) return;
+        document.getElementById("editor-title").textContent = "编辑人设卡：" + name;
+        document.getElementById("card-editor").value = data.content || "";
+        cardEditorDirty = false;
+      } catch (e) {
+        toast("加载人设卡失败：" + e.message);
+      }
     }
 
     async function saveCurrentCard() {
       if (!selectedCard) return toast("请先选择或新建人设卡");
-      const content = document.getElementById("card-editor").value;
-      await api("/api/card", { method: "POST", body: JSON.stringify({ name: selectedCard, content }) });
-      toast("已保存并同步规则：" + selectedCard);
-      await refreshAll();
+      try {
+        const content = document.getElementById("card-editor").value;
+        await api("/api/card", { method: "POST", body: JSON.stringify({ name: selectedCard, content }) });
+        cardEditorDirty = false;
+        toast("已保存并同步规则：" + selectedCard);
+        await refreshAll();
+      } catch (e) {
+        toast("保存失败：" + e.message);
+      }
     }
 
     function ensureAzureDialogStyle() {
@@ -583,21 +604,34 @@
         danger: true
       });
       if (!ok) return;
-      await api("/api/card/delete", { method: "POST", body: JSON.stringify({ name }) });
-      toast("已删除：" + name);
-      await refreshAll();
+      try {
+        await api("/api/card/delete", { method: "POST", body: JSON.stringify({ name }) });
+        if (selectedCard === name) cardEditorDirty = false;
+        toast("已删除：" + name);
+        await refreshAll();
+      } catch (e) {
+        toast("删除失败：" + e.message);
+      }
     }
 
     async function toggleMem(card, enabled) {
-      await api("/api/memory/toggle", { method: "POST", body: JSON.stringify({ card, enabled }) });
-      toast(`${card} 的记忆已${enabled ? "开启" : "关闭"}`);
-      await refreshAll();
+      try {
+        await api("/api/memory/toggle", { method: "POST", body: JSON.stringify({ card, enabled }) });
+        toast(`${card} 的记忆已${enabled ? "开启" : "关闭"}`);
+        await refreshAll();
+      } catch (e) {
+        toast("切换记忆开关失败：" + e.message);
+      }
     }
 
     function renderWorkspaces() {
       const sel = document.getElementById("ws-card");
+      const prevVal = sel.value;
       sel.innerHTML = state.cards.map((c) => `<option value="${escapeHtml(c.name)}">${escapeHtml(c.name)}</option>`).join("")
         + '<option value="__none__">（此工作区禁用人设）</option>';
+      if (prevVal && [...sel.options].some((o) => o.value === prevVal)) {
+        sel.value = prevVal;
+      }
       const list = document.getElementById("ws-list");
       list.innerHTML = "";
       const entries = Object.entries(state.workspaceCards || {});
@@ -623,10 +657,14 @@
       const workspace = document.getElementById("ws-path").value.trim();
       const card = document.getElementById("ws-card").value;
       if (!workspace) return toast("请填写工作区路径");
-      await api("/api/workspace", { method: "POST", body: JSON.stringify({ workspace, card }) });
-      toast("已保存工作区绑定");
-      document.getElementById("ws-path").value = "";
-      await refreshAll();
+      try {
+        await api("/api/workspace", { method: "POST", body: JSON.stringify({ workspace, card }) });
+        toast("已保存工作区绑定");
+        document.getElementById("ws-path").value = "";
+        await refreshAll();
+      } catch (e) {
+        toast("绑定失败：" + e.message);
+      }
     }
 
     async function unbindWorkspace(workspace) {
@@ -719,7 +757,7 @@
       return String(s).replace(/[&<>"']/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
     }
     function escapeJs(s) {
-      return String(s).replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+      return String(s).replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/"/g, "&quot;");
     }
 
     try { applyTheme(localStorage.getItem("soul_md_theme") || "dark"); } catch {}

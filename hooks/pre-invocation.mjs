@@ -71,10 +71,16 @@ async function main() {
     return;
   }
 
-  const cardPath = path.join(CARDS_DIR, `${activeCard}.md`);
+  const safeCard = String(activeCard).trim().replace(/[<>:"/\\|?*\x00-\x1f]/g, "");
+  if (!safeCard || safeCard === "." || safeCard === ".." || safeCard.includes("..")) {
+    process.stdout.write("{}\n");
+    return;
+  }
+
+  const cardPath = path.join(CARDS_DIR, `${safeCard}.md`);
   const cardContent = fs.existsSync(cardPath) ? fs.readFileSync(cardPath, "utf8") : "";
-  const anchorText = buildAnchor(activeCard, cardContent);
-  const fingerprint = buildFingerprint(activeCard, anchorText);
+  const anchorText = buildAnchor(safeCard, cardContent);
+  const fingerprint = buildFingerprint(safeCard, anchorText);
 
   // 回合级去重：同一用户轮次（initialNumSteps）只注入一次；
   // 切换人设 / 修改人设卡内容导致指纹变化时立即重新注入。
