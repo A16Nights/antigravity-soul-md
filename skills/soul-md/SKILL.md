@@ -9,7 +9,7 @@ description: >-
 
 # Soul.md 人设工坊与分层记忆
 
-本插件对标 `dsh-soul-md`，提供多人设卡切换、工作区人设绑定、分层文件记忆以及右侧可视化面板（`[Soul.md 人设工坊](sidecar://soul-md/studio/)`）。
+苍蓝魂匣提供多人设卡切换、工作区人设绑定、分层文件记忆以及右侧可视化面板（`[Soul.md 人设工坊](sidecar://soul-md/studio/)；Antigravity 2.35.1+ 回复含该链接会自动在侧栏展开，仅在用户要求打开面板时按需输出`）。
 
 ## 数据目录
 - 人设卡：`~/.gemini/soul-md\cards\<name>.md`
