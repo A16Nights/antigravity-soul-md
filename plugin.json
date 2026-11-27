@@ -1,8 +1,8 @@
 {
   "name": "soul-md",
-  "displayName": "苍蓝魂匣",
-  "version": "2.3.8",
-  "description": "苍蓝魂匣（Soul.md）— 多人设卡管理与分层文件记忆插件：支持新建/在线编辑/一键热切换全局默认人设卡、工作区专属人设绑定、外接模型智能识别的 PreInvocation 底层身份锚防掉线强化、按人设独立开关的 core.md + topics/*.md 分层文件记忆，并与苍蓝罗盘及蓝汐认知图谱深度联动。",
+  "displayName": "苍蓝魂匣——人设卡与分层记忆",
+  "version": "2.3.9",
+  "description": "苍蓝魂匣——人设卡与分层记忆（Soul.md Studio）：多人设卡管理与分层文件记忆插件：支持新建/在线编辑/一键热切换全局默认人设卡、工作区专属人设绑定、外接模型智能识别的 PreInvocation 底层身份锚防掉线强化、按人设独立开关的 core.md + topics/*.md 分层文件记忆，并与苍蓝罗盘及蓝汐认知图谱深度联动；内置首次使用交互式新手引导与真实控件定位高亮。",
   "logo": "assets/logo.svg",
   "suggestedPrompts": [
     "列出当前所有人设卡，帮我切换到另一张人设卡",
