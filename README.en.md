@@ -71,7 +71,8 @@ Always-on <code>core.md</code> + topical <code>topics/*.md</code> with <code>per
 </picture>
 </h2>
 
-### 1. Multi-Persona Cards & Instant Hot Switching
+### 1. Multi-Persona Cards, Bundled Presets & Instant Hot Switching
+- **Bundled Starter Personas**: Ships ready-to-use with **`默认工程助手`**, **`冷静工程助手`**, and the newly added **[`Gemini猫娘` (Gemini Neko)](presets/Gemini猫娘.md)** persona card (a lively cyber catgirl persona balancing rigorous engineering accuracy with warm companionship, paired nicely with the Gemini Neko desktop widget). Seeded once automatically without overwriting existing cards or re-creating cards you delete.
 - **In-Panel Authoring**: Create and edit Markdown persona cards using native glass modals (`azurePrompt`) and switch the global default persona in one click.
 - **Atomic Rule Sync**: Saving or switching the default persona atomically updates `rules/AGENTS.md`, taking effect on the very next turn.
 - **Safe Deletion**: Deleting a card requires double confirmation and preserves its historical memory files by default.
